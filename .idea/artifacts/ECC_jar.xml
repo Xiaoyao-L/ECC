@@ -1,9 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="ECC:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/ECC_jar</output-path>
-    <root id="archive" name="ECC.jar">
-      <element id="module-output" name="ECC" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/gov/nist/math/jama/1.0.3/jama-1.0.3.jar" path-in-jar="/" />
-    </root>
-  </artifact>
-</component>

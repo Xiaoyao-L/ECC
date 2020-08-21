@@ -21,11 +21,11 @@ import java.util.stream.IntStream;
  * @date 2020/8/17 14:45
  * @project ECC
  */
-public class Gui extends JFrame implements ActionListener{
+public class Gui extends JFrame implements ActionListener, ItemListener{
 
-    public static CodeFunc codeGenerate = new CodeFunc();
+  /*  public static CodeFunc codeGenerate = new CodeFunc();
     public static DistanceFunc distanceFunc = new DistanceFunc();
-    public static GaussChannel gaussChannel = new GaussChannel();
+    public static GaussChannel gaussChannel = new GaussChannel();*/
     private JPanel p = new JPanel();
 
 
@@ -58,6 +58,8 @@ public class Gui extends JFrame implements ActionListener{
     private String[] tableTitle = {"Codewords","Euclidean Distance","Hamming Distance"};
     private Object[][] tableData = {{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0}};
     private JTable table = new JTable();
+
+    private static Matrix code1;
     public Gui(){
         super("Error Correct Coding - Soft-Decision Decoding");
 
@@ -78,19 +80,27 @@ public class Gui extends JFrame implements ActionListener{
         this.add(p);
 
         comboBox1.addItem("please select the code");
-        //comboBox1.addItem("(8,2,5)");
+        comboBox1.addItem("(8,2,5)");
         comboBox1.addItem("(7,4,3)");
+        comboBox1.addItem("(5,2,3)");
+        comboBox1.addItem("(8,3,4)");
         comboBox1.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent itemEvent) {
                 if (itemEvent.getStateChange() == ItemEvent.SELECTED)
                 {
                     if (itemEvent.getItem().equals("(8,2,5)")){
-                        //code1();
+                        code1();
                     }
                     else if(itemEvent.getItem().equals("(7,4,3)")){
                         code2();
                 }
+                    else if(itemEvent.getItem().equals("(5,2,3)")) {
+                        code3();
+                    }
+                    else if(itemEvent.getItem().equals("(8,3,4)")) {
+                        code4();
+                    }
                 }
             }
         });
@@ -120,6 +130,7 @@ public class Gui extends JFrame implements ActionListener{
         p.add(label4);label4.setBounds(40,180,200,20);
         comboBox2.addItem("please choose the codeword");
         p.add(comboBox2);comboBox2.setBounds(200,180,450,20);
+        comboBox2.addItemListener(this::itemStateChanged);
         //comboBox1.addItem("(8,2,5)");
         //comboBox1.addItem("(7,4,3)");
         p.add(label5);label5.setBounds(40,220,200,20);
@@ -174,7 +185,8 @@ public class Gui extends JFrame implements ActionListener{
         generateMatrix.setText(GM);
         double C[][] = {{0,0},{0,1},{1,0},{1,1}};
         Matrix C_matrix = new Matrix(C);
-        Matrix codeword = codeGenerate.dex2binary(C_matrix.times(G_matrix));
+        Matrix codeword = new CodeFunc().dex2binary(C_matrix.times(G_matrix));
+        code1 = codeword;
         String codeword_ = "";
         comboBox2.removeAllItems();
         for (int i = 0; i < codeword.getRowDimension(); i++) {
@@ -184,7 +196,7 @@ public class Gui extends JFrame implements ActionListener{
                     .replace("]"," ").replace(","," "));
         }
 
-        comboBox2.addItemListener(e -> {
+/*        comboBox2.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 // 选择的下拉框选项
                 System.out.println(Arrays.toString(e.getItem().toString().split("  ")));
@@ -195,22 +207,22 @@ public class Gui extends JFrame implements ActionListener{
                     data[i] = Double.parseDouble(temp[i]);
                 }
                 //System.out.println(Arrays.toString(data));
-                double[] code_bpsk = codeGenerate.bpsk(data);
-                String[] code_show = codeGenerate.bpsk2String(data);
+                double[] code_bpsk = new CodeFunc().bpsk(data);
+                String[] code_show = new CodeFunc().bpsk2String(data);
                 textField1.setText(Arrays.toString(code_show).replace("["," ")
                         .replace("]"," ").replace(","," "));
 
-                double[] noise = gaussChannel.noiseGenerate(1, 0, code_bpsk.length);
-                double[] withNoise =gaussChannel.addNoise(code_bpsk,noise);
-                textField2.setText(Arrays.toString(gaussChannel.double2Stirng(withNoise)).replace("["," ")
+                double[] noise = new GaussChannel().noiseGenerate(1, 0, code_bpsk.length);
+                double[] withNoise = new GaussChannel().addNoise(code_bpsk,noise);
+                textField2.setText(Arrays.toString(new GaussChannel().double2Stirng(withNoise)).replace("["," ")
                         .replace("]"," ").replace(","," "));
-                double[] dem = codeGenerate.demodulator(withNoise);
-                String[] dem_show = codeGenerate.bpsk2String(dem);
+                double[] dem = new CodeFunc().demodulator(withNoise);
+                String[] dem_show = new CodeFunc().bpsk2String(dem);
                 textField3.setText(Arrays.toString(dem_show).replace("["," ")
                         .replace("]"," ").replace(","," "));
-                setTable(codeword,dem,withNoise);
+                setTable(new CodeFunc().dex2binary(C_matrix.times(G_matrix)),dem,withNoise);
             }
-        });
+        });*/
         codewords.setText(codeword_);
     }
 
@@ -232,7 +244,8 @@ public class Gui extends JFrame implements ActionListener{
                 {1,1,0,0},{1,1,0,1},{1,1,1,0},{1,1,1,1}
         };
         Matrix C_matrix = new Matrix(C);
-        Matrix codeword = codeGenerate.dex2binary(C_matrix.times(G_matrix));
+        Matrix codeword = new CodeFunc().dex2binary(C_matrix.times(G_matrix));
+        code1 = codeword;
         String codeword_ = "";
         comboBox2.removeAllItems();
         for (int i = 0; i < codeword.getRowDimension(); i++) {
@@ -242,7 +255,7 @@ public class Gui extends JFrame implements ActionListener{
                     .replace("]"," ").replace(","," "));
         }
 
-        comboBox2.addItemListener(e -> {
+/*        comboBox2.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 // 选择的下拉框选项
                 System.out.println(Arrays.toString(e.getItem().toString().split("  ")));
@@ -253,22 +266,134 @@ public class Gui extends JFrame implements ActionListener{
                     data[i] = Double.parseDouble(temp[i]);
                 }
                 //System.out.println(Arrays.toString(data));
-                double[] code_bpsk = codeGenerate.bpsk(data);
-                String[] code_show = codeGenerate.bpsk2String(data);
+                double[] code_bpsk = new CodeFunc().bpsk(data);
+                String[] code_show = new CodeFunc().bpsk2String(data);
                 textField1.setText(Arrays.toString(code_show).replace("["," ")
                         .replace("]"," ").replace(","," "));
 
-                double[] noise = gaussChannel.noiseGenerate(1, 0, code_bpsk.length);
-                double[] withNoise =gaussChannel.addNoise(code_bpsk,noise);
-                textField2.setText(Arrays.toString(gaussChannel.double2Stirng(withNoise)).replace("["," ")
+                double[] noise = new GaussChannel().noiseGenerate(1, 0, code_bpsk.length);
+                double[] withNoise =new GaussChannel().addNoise(code_bpsk,noise);
+                textField2.setText(Arrays.toString(new GaussChannel().double2Stirng(withNoise)).replace("["," ")
                         .replace("]"," ").replace(","," "));
-                double[] dem = codeGenerate.demodulator(withNoise);
-                String[] dem_show = codeGenerate.bpsk2String(dem);
+                double[] dem = new CodeFunc().demodulator(withNoise);
+                String[] dem_show = new CodeFunc().bpsk2String(dem);
                 textField3.setText(Arrays.toString(dem_show).replace("["," ")
                         .replace("]"," ").replace(","," "));
                 setTable(codeword,dem,withNoise);
             }
-        });
+        });*/
+        codewords.setText(codeword_);
+    }
+
+    public void code3(){
+        //double G[][] = {{1,0,1,1,1,1,0,0},{0,1,1,1,0,0,1,1}};
+        //System.out.println(G[0].length);
+        double G[][] = {{1,0,1,0,1},{0,1,0,1,1}};
+
+        Matrix G_matrix = new Matrix(G);
+        String GM = "";
+        for (int i = 0; i < G_matrix.getRowDimension(); i++) {
+            GM = GM + Arrays.toString(roundUp(G[i])).replace("["," ").replace("]"," ")
+                    .replace(","," ") + "\n";
+        }
+        generateMatrix.setText(GM);
+        double C[][] = {{0,0},{0,1},{1,0},{1,1}};
+        Matrix C_matrix = new Matrix(C);
+        Matrix codeword = new CodeFunc().dex2binary(C_matrix.times(G_matrix));
+        code1 = codeword;
+        String codeword_ = "";
+        comboBox2.removeAllItems();
+        for (int i = 0; i < codeword.getRowDimension(); i++) {
+            codeword_ = codeword_ + Arrays.toString(roundUp(codeword.getArrayCopy()[i])).replace("["," ").
+                    replace("]"," ").replace(","," ") + "\n";
+            comboBox2.addItem(Arrays.toString(roundUp(codeword.getArrayCopy()[i])).replace("["," ")
+                    .replace("]"," ").replace(","," "));
+        }
+
+/*        comboBox2.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                // 选择的下拉框选项
+                System.out.println(Arrays.toString(e.getItem().toString().split("  ")));
+                String[] temp = e.getItem().toString().split("  ");
+                double[] data = new double[temp.length];
+                for (int i = 0; i < temp.length; i++)
+                {
+                    data[i] = Double.parseDouble(temp[i]);
+                }
+                //System.out.println(Arrays.toString(data));
+                double[] code_bpsk = new CodeFunc().bpsk(data);
+                String[] code_show = new CodeFunc().bpsk2String(data);
+                textField1.setText(Arrays.toString(code_show).replace("["," ")
+                        .replace("]"," ").replace(","," "));
+
+                double[] noise = new GaussChannel().noiseGenerate(1, 0, code_bpsk.length);
+                double[] withNoise =new GaussChannel().addNoise(code_bpsk,noise);
+                textField2.setText(Arrays.toString(new GaussChannel().double2Stirng(withNoise)).replace("["," ")
+                        .replace("]"," ").replace(","," "));
+                double[] dem = new CodeFunc().demodulator(withNoise);
+                String[] dem_show = new CodeFunc().bpsk2String(dem);
+                textField3.setText(Arrays.toString(dem_show).replace("["," ")
+                        .replace("]"," ").replace(","," "));
+                setTable(codeword,dem,withNoise);
+            }
+        });*/
+        codewords.setText(codeword_);
+    }
+
+    public void code4(){
+        //double G[][] = {{1,0,1,1,1,1,0,0},{0,1,1,1,0,0,1,1}};
+        //System.out.println(G[0].length);
+        double G[][] = {{1,1,0,0,1,1,0,0},{0,1,1,0,0,1,1,0},{0,0,1,1,0,0,1,1}};
+
+        Matrix G_matrix = new Matrix(G);
+        String GM = "";
+        for (int i = 0; i < G_matrix.getRowDimension(); i++) {
+            GM = GM + Arrays.toString(roundUp(G[i])).replace("["," ").replace("]"," ")
+                    .replace(","," ") + "\n";
+        }
+        generateMatrix.setText(GM);
+        double C[][] = {{0,0,0},{0,0,1},{0,1,0},{0,1,1},
+                {1,0,0},{1,0,1},{1,1,0},{1,1,1}
+        };
+        Matrix C_matrix = new Matrix(C);
+        Matrix codeword = new CodeFunc().dex2binary(C_matrix.times(G_matrix));
+        code1 = codeword;
+        String codeword_ = "";
+        comboBox2.removeAllItems();
+        for (int i = 0; i < codeword.getRowDimension(); i++) {
+            codeword_ = codeword_ + Arrays.toString(roundUp(codeword.getArrayCopy()[i])).replace("["," ").
+                    replace("]"," ").replace(","," ") + "\n";
+            comboBox2.addItem(Arrays.toString(roundUp(codeword.getArrayCopy()[i])).replace("["," ")
+                    .replace("]"," ").replace(","," "));
+        }
+
+/*        comboBox2.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                // 选择的下拉框选项
+                System.out.println(Arrays.toString(e.getItem().toString().split("  ")));
+                String[] temp = e.getItem().toString().split("  ");
+                double[] data = new double[temp.length];
+                for (int i = 0; i < temp.length; i++)
+                {
+                    data[i] = Double.parseDouble(temp[i]);
+                }
+                //System.out.println(Arrays.toString(data));
+                double[] code_bpsk = new CodeFunc().bpsk(data);
+                String[] code_show = new CodeFunc().bpsk2String(data);
+                textField1.setText(Arrays.toString(code_show).replace("["," ")
+                        .replace("]"," ").replace(","," "));
+
+                double[] noise = new GaussChannel().noiseGenerate(1, 0, code_bpsk.length);
+                double[] withNoise =new GaussChannel().addNoise(code_bpsk,noise);
+                textField2.setText(Arrays.toString(new GaussChannel().double2Stirng(withNoise)).replace("["," ")
+                        .replace("]"," ").replace(","," "));
+                double[] dem = new CodeFunc().demodulator(withNoise);
+                String[] dem_show = new CodeFunc().bpsk2String(dem);
+                textField3.setText(Arrays.toString(dem_show).replace("["," ")
+                        .replace("]"," ").replace(","," "));
+                setTable(codeword,dem,withNoise);
+            }
+        });*/
         codewords.setText(codeword_);
     }
 
@@ -281,13 +406,14 @@ public class Gui extends JFrame implements ActionListener{
 
         for(int i = 0; i < codeword.getRowDimension(); i++)
         {
+            //System.out.println(codeword.getRowDimension());
                 data_[i][0] = Arrays.toString(roundUp(codeword.getArrayCopy()[i])).replace("["," ")
                         .replace("]"," ").replace(","," ");
                 //data_[i][0] = "0";
-                data_[i][1] = String.valueOf(distanceFunc.euclideanDistance(withnoise,codeGenerate.bpsk(codeword.getArrayCopy()[i])));
-                distance_eu[i] = distanceFunc.euclideanDistance(withnoise,codeGenerate.bpsk(codeword.getArrayCopy()[i]));
-                data_[i][2] = String.valueOf(distanceFunc.hammingDistance(dem,codeword.getArrayCopy()[i]));
-                distance_hamming[i] = distanceFunc.hammingDistance(dem,codeword.getArrayCopy()[i]);
+                data_[i][1] = String.valueOf(new DistanceFunc().euclideanDistance(withnoise,new CodeFunc().bpsk(codeword.getArrayCopy()[i])));
+                distance_eu[i] = new DistanceFunc().euclideanDistance(withnoise,new CodeFunc().bpsk(codeword.getArrayCopy()[i]));
+                data_[i][2] = String.valueOf(new DistanceFunc().hammingDistance(dem,codeword.getArrayCopy()[i]));
+                distance_hamming[i] = new DistanceFunc().hammingDistance(dem,codeword.getArrayCopy()[i]);
         }
 
         int index_eu = IntStream.range(0, distance_eu.length).reduce((i, j) -> distance_eu[i] > distance_eu[j] ? j : i).getAsInt();
@@ -323,6 +449,35 @@ public class Gui extends JFrame implements ActionListener{
     }
 
 
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            // 选择的下拉框选项
+            System.out.println(Arrays.toString(e.getItem().toString().split("  ")));
+            String[] temp = e.getItem().toString().split("  ");
+            double[] data = new double[temp.length];
+            for (int i = 0; i < temp.length; i++)
+            {
+                data[i] = Double.parseDouble(temp[i]);
+            }
+            //System.out.println(Arrays.toString(data));
+            double[] code_bpsk = new CodeFunc().bpsk(data);
+            String[] code_show = new CodeFunc().bpsk2String(data);
+            textField1.setText(Arrays.toString(code_show).replace("["," ")
+                    .replace("]"," ").replace(","," "));
+
+            double[] noise = new GaussChannel().noiseGenerate(1, 0, code_bpsk.length);
+            double[] withNoise = new GaussChannel().addNoise(code_bpsk,noise);
+            textField2.setText(Arrays.toString(new GaussChannel().double2Stirng(withNoise)).replace("["," ")
+                    .replace("]"," ").replace(","," "));
+            double[] dem = new CodeFunc().demodulator(withNoise);
+            String[] dem_show = new CodeFunc().bpsk2String(dem);
+            textField3.setText(Arrays.toString(dem_show).replace("["," ")
+                    .replace("]"," ").replace(","," "));
+            setTable(code1,dem,withNoise);
+        }
+
+    }
 }
 
 
